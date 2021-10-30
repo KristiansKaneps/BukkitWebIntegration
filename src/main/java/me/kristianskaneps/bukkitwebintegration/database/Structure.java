@@ -1,0 +1,33 @@
+package me.kristianskaneps.bukkitwebintegration.database;
+
+import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
+
+import java.sql.SQLException;
+
+public class Structure
+{
+	private final Database database;
+
+	protected Structure(Database database)
+	{
+		this.database = database;
+	}
+
+	protected void create() throws SQLException
+	{
+		database.dsl()
+				.createTableIfNotExists(database.tableConfig.players)
+				.column("id", SQLDataType.BIGINTUNSIGNED.identity(true))
+				.column("uuid", SQLDataType.UUID.nullable(false))
+				.column("name", SQLDataType.VARCHAR(16).collation(DSL.collation("ascii_general_ci")).nullable(false))
+				.column("online", SQLDataType.BOOLEAN.nullable(false).defaultValue(true))
+				.column("last_login", SQLDataType.LOCALDATETIME.nullable(true))
+				.column("last_logout", SQLDataType.LOCALDATETIME.nullable(true))
+				.column("ip", SQLDataType.VARCHAR(15).nullable(true))
+				.column("created_at", SQLDataType.LOCALDATETIME.nullable(false))
+				.unique("uuid")
+				.primaryKey("id")
+				.execute();
+	}
+}

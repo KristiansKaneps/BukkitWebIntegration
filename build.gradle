@@ -1,0 +1,71 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'dev.ethp.bukkit' version '0.2.5'
+}
+
+version = '1.0.0'
+def spigotVersion = '1.16.5'
+group 'me.kristianskaneps.bukkitwebintegration'
+version '1.0-SNAPSHOT'
+
+bukkit {
+    name 'BukkitWebIntegration'
+    main 'me.kristianskaneps.bukkitwebintegration.WebIntegration'
+
+    description 'Adds web integration to server.'
+
+    author 'kristianskaneps'
+
+    api {
+        version spigotVersion
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir "src/main/java"
+        }
+    }
+}
+
+repositories {
+    flatDir { dirs 'dependencies' }
+    mavenCentral()
+    maven {
+        url 'https://repo.codemc.org/repository/maven-public/'
+        name 'codemc'
+    }
+}
+
+configurations {
+    shadow
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+
+    implementation fileTree(dir: 'dependencies', include: '*.jar')
+    shadow fileTree(dir: 'dependencies', include: '*.jar')
+
+    spigotApi()
+}
+
+jar {
+    archiveName project.name + '-' + project.version + '.jar'
+
+    from('.') {
+        include '*.yml'
+    }
+
+    duplicatesStrategy DuplicatesStrategy.EXCLUDE
+    from configurations.shadow.collect { it.isDirectory() ? it : zipTree(it) }
+
+    entryCompression ZipEntryCompression.DEFLATED
+}
+
+test {
+    useJUnitPlatform()
+}

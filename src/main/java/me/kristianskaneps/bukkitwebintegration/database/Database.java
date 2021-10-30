@@ -5,6 +5,7 @@ import me.kristianskaneps.bukkitwebintegration.config.DatabaseTableConfig;
 import me.kristianskaneps.bukkitwebintegration.database.table.PlayersTable;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.tools.JooqLogger;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -27,6 +28,7 @@ public class Database
 	{
 		this.connectionConfig = connectionConfig;
 		this.tableConfig = tableConfig;
+		JooqLogger.globalThreshold(Log.Level.WARN);
 	}
 
 	public static PlayersTable playersTable()

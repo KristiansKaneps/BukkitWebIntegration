@@ -68,8 +68,11 @@ public class UnauthenticatedPlayerEvents implements Listener, NotificationListen
 		if(auth.mandatory_register && !Database.playerCredentialsTable().exists(playerUuid))
 		{
 			mustRegister(player);
+			event.setCancelled(true);
+			return;
 		}
-		else
+
+		if(auth.mandatory_login)
 		{
 			if(authenticated.contains(playerUuid)) return; // Player is authenticated.
 			if(Database.playersTable().isAuthenticated(player)) // Player is authenticated.
@@ -79,9 +82,8 @@ public class UnauthenticatedPlayerEvents implements Listener, NotificationListen
 			}
 
 			mustLogin(player);
+			event.setCancelled(true);
 		}
-
-		event.setCancelled(true);
 	}
 
 	private void mustRegister(Player player)

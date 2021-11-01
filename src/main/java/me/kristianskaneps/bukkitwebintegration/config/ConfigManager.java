@@ -8,6 +8,7 @@ public final class ConfigManager
 {
 	public static final AtomicReference<DatabaseConnectionConfig> databaseConnection = new AtomicReference<>();
 	public static final AtomicReference<DatabaseTableConfig> databaseTables = new AtomicReference<>();
+	public static final AtomicReference<AuthConfig> auth = new AtomicReference<>();
 
 	private final WebIntegration instance;
 
@@ -23,5 +24,6 @@ public final class ConfigManager
 
 		databaseConnection.set(new DatabaseConnectionConfig(instance.getConfig()));
 		databaseTables.set(new DatabaseTableConfig(instance.getConfig()));
+		auth.set(new AuthConfig(instance.getConfig()));
 	}
 }

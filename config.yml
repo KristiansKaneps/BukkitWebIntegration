@@ -4,3 +4,9 @@ database:
   password: "root"
   table:
     players: "players"
+    player_credentials: "player_credentials"
+
+auth:
+  enabled: true
+  mandatory_register: true
+  mandatory_login: true

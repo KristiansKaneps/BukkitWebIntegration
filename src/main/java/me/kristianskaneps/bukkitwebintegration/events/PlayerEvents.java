@@ -1,7 +1,9 @@
 package me.kristianskaneps.bukkitwebintegration.events;
 
+import me.kristianskaneps.bukkitwebintegration.Notification;
 import me.kristianskaneps.bukkitwebintegration.WebIntegration;
 import me.kristianskaneps.bukkitwebintegration.database.Database;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -20,12 +22,16 @@ public class PlayerEvents implements Listener
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerJoin(PlayerJoinEvent event)
 	{
-		Database.playersTable().onLogin(event.getPlayer());
+		final Player player = event.getPlayer();
+		Database.playersTable().onJoin(player);
+		instance.pushNotification(new Notification(Notification.Type.PLAYER_JOIN, player));
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
-	public void onPlayerLeave(PlayerQuitEvent event)
+	public void onPlayerQuit(PlayerQuitEvent event)
 	{
-		Database.playersTable().onLogout(event.getPlayer());
+		final Player player = event.getPlayer();
+		Database.playersTable().onQuit(player);
+		instance.pushNotification(new Notification(Notification.Type.PLAYER_QUIT, player));
 	}
 }

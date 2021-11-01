@@ -4,7 +4,6 @@ plugins {
     id 'dev.ethp.bukkit' version '0.2.5'
 }
 
-version = '1.0.0'
 def spigotVersion = '1.16.5'
 group 'me.kristianskaneps.bukkitwebintegration'
 version '1.0-SNAPSHOT'
@@ -19,6 +18,16 @@ bukkit {
 
     api {
         version spigotVersion
+    }
+
+    command 'register', {
+        description 'Player registration command.'
+    }
+    command 'login', {
+        description 'Player login command.'
+    }
+    command 'logout', {
+        description 'Player logout command.'
     }
 }
 
@@ -47,6 +56,9 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 
+    implementation 'at.favre.lib:bcrypt:0.9.0'
+    shadow 'at.favre.lib:bcrypt:0.9.0'
+
     implementation fileTree(dir: 'dependencies', include: '*.jar')
     shadow fileTree(dir: 'dependencies', include: '*.jar')
 
@@ -62,6 +74,24 @@ jar {
 
     duplicatesStrategy DuplicatesStrategy.EXCLUDE
     from configurations.shadow.collect { it.isDirectory() ? it : zipTree(it) }
+
+    exclude "META-INF/*.SF"
+    exclude "META-INF/*.DSA"
+    exclude "META-INF/*.RSA"
+    exclude "META-INF/maven/"
+    exclude "META-INF/services/"
+    exclude "META-INF/versions/"
+    exclude "META-INF/*.txt"
+    exclude "META-INF/CHANGELOG"
+    exclude "META-INF/LICENSE"
+    exclude "META-INF/NOTICE"
+    exclude "**/*.html"
+    exclude "module-info.*"
+    exclude "Log4j-*"
+    exclude "mime.types"
+    exclude "VersionInfo.java"
+    exclude "xsd/"
+    exclude "migrations/"
 
     entryCompression ZipEntryCompression.DEFLATED
 }

@@ -2,6 +2,7 @@ package me.kristianskaneps.bukkitwebintegration.database;
 
 import me.kristianskaneps.bukkitwebintegration.config.DatabaseConnectionConfig;
 import me.kristianskaneps.bukkitwebintegration.config.DatabaseTableConfig;
+import me.kristianskaneps.bukkitwebintegration.database.table.PlayerCredentialsTable;
 import me.kristianskaneps.bukkitwebintegration.database.table.PlayersTable;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -18,8 +19,10 @@ public class Database
 	public static void setInstance(Database instance) { INSTANCE.set(instance); }
 
 	private PlayersTable playersTable;
+	private PlayerCredentialsTable playerCredentialsTable;
 
 	private Connection conn;
+	private DSLContext dsl;
 
 	protected final DatabaseConnectionConfig connectionConfig;
 	protected final DatabaseTableConfig tableConfig;
@@ -39,6 +42,14 @@ public class Database
 		}
 	}
 
+	public static PlayerCredentialsTable playerCredentialsTable()
+	{
+		synchronized (INSTANCE)
+		{
+			return INSTANCE.get().playerCredentialsTable;
+		}
+	}
+
 	public static DSLContext query()
 	{
 		synchronized (INSTANCE)
@@ -51,10 +62,9 @@ public class Database
 	{
 		synchronized (INSTANCE)
 		{
-			final Database db = INSTANCE.get();
 			try {
-				if(!db.isConnected()) db.connect();
-				return DSL.using(conn, SQLDialect.MYSQL);
+				if(!isConnected()) connect();
+				return dsl;
 			} catch(DatabaseException e) {
 				e.printStackTrace();
 			}
@@ -86,6 +96,7 @@ public class Database
 						connectionConfig.username,
 						connectionConfig.password
 				);
+				dsl = DSL.using(conn, SQLDialect.MYSQL);
 				new Structure(this).create();
 				initializeTableReferences();
 			} catch(SQLException e) {
@@ -100,6 +111,7 @@ public class Database
 		{
 			try {
 				if(conn == null || conn.isClosed()) return;
+				dsl = null;
 				conn.close();
 				conn = null;
 			} catch(SQLException ignored) {}
@@ -109,5 +121,6 @@ public class Database
 	private void initializeTableReferences()
 	{
 		playersTable = new PlayersTable(tableConfig.players);
+		playerCredentialsTable = new PlayerCredentialsTable(tableConfig.playerCredentials);
 	}
 }

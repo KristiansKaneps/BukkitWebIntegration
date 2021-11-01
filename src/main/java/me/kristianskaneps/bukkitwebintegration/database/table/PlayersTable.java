@@ -24,7 +24,7 @@ public final class PlayersTable
 	private final Field<ULong> id;
 	private final Field<UUID> uuid;
 	private final Field<String> name;
-	private final Field<Boolean> online;
+	private final Field<Boolean> online, authenticated;
 	private final Field<LocalDateTime> last_login, last_logout;
 	private final Field<String> login_world;
 	private final Field<Double> login_x, login_y, login_z;
@@ -40,6 +40,7 @@ public final class PlayersTable
 		uuid = field(name("uuid"), SQLDataType.UUID);
 		name = field(name("name"), SQLDataType.VARCHAR);
 		online = field(name("online"), SQLDataType.BOOLEAN);
+		authenticated = field(name("authenticated"), SQLDataType.BOOLEAN);
 		last_login = field(name("last_login"), SQLDataType.LOCALDATETIME);
 		last_logout = field(name("last_logout"), SQLDataType.LOCALDATETIME);
 		login_world = field(name("login_world"), SQLDataType.VARCHAR);
@@ -90,7 +91,7 @@ public final class PlayersTable
 				).execute();
 	}
 
-	public void onLogin(Player player)
+	public void onJoin(Player player)
 	{
 		if(exists(player.getUniqueId()))
 		{
@@ -115,7 +116,7 @@ public final class PlayersTable
 		}
 	}
 
-	public void onLogout(Player player)
+	public void onQuit(Player player)
 	{
 		if(exists(player.getUniqueId()))
 		{
@@ -124,6 +125,7 @@ public final class PlayersTable
 			Database.query()
 					.update(table)
 					.set(online, false)
+					.set(authenticated, false)
 					.set(last_logout, LocalDateTime.now())
 					.set(logout_world, world == null ? null : world.getName())
 					.set(logout_x, loc.getX())
@@ -132,5 +134,28 @@ public final class PlayersTable
 					.where(uuid.eq(player.getUniqueId()))
 					.execute();
 		}
+	}
+
+	public void setAuthenticated(Player player, boolean authenticated)
+	{
+		if(exists(player.getUniqueId()))
+		{
+			Database.query()
+					.update(table)
+					.set(this.authenticated, authenticated)
+					.where(uuid.eq(player.getUniqueId()))
+					.execute();
+		}
+	}
+
+	public boolean isAuthenticated(Player player)
+	{
+		final UUID playerUuid = player.getUniqueId();
+		return exists(playerUuid)
+			   && Database.query()
+						  .select(authenticated)
+						  .from(table)
+						  .where(uuid.eq(playerUuid))
+						  .fetchSingle(authenticated) == Boolean.TRUE;
 	}
 }
